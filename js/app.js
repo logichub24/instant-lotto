@@ -98,7 +98,7 @@ function renderSavedTickets() {
     const item = document.createElement('article');
     item.className = 'bg-white p-2 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 scratch-bg-pattern';
     const top = document.createElement('div');
-    top.className = 'flex justify-between items-center text-xs font-bold text-gray-600 bg-white/80 px-1 rounded';
+    top.className = 'flex justify-between items-center text-sm font-bold text-gray-700 bg-white/80 px-1 rounded';
     const date = document.createElement('span');
     date.textContent = `저장일시: ${formatDate(ticket.savedAt)} · 제${round}회`;
     const remove = document.createElement('button');
@@ -134,7 +134,7 @@ function renderResults() {
     const item = document.createElement('article');
     item.className = 'bg-white rounded-xl border border-gray-100 p-2 shadow-sm';
     const title = document.createElement('p');
-    title.className = 'text-sm font-bold text-gray-700';
+    title.className = 'text-base font-bold text-gray-800';
     title.textContent = compared ? `번호 ${compared.count}개 일치${compared.bonus ? ' · 보너스 일치' : ''}` : `제${round}회 추첨 전`;
     const numbers = document.createElement('div');
     numbers.className = 'flex items-center justify-between gap-2 mt-1';
