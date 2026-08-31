@@ -28,6 +28,7 @@
             flex-direction: column;
             box-shadow: 0 0 20px rgba(0,0,0,0.05);
             position: relative;
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         /* Scratch Zone Container */
@@ -252,6 +253,7 @@
                 <div id="saved-list" class="flex flex-col gap-2">
                     <!-- Saved items injected here -->
                 </div>
+                <p id="saved-limit-message" class="hidden mt-3 text-xs font-bold text-gray-600">최근 50개 저장번호만 표시합니다.</p>
 
                 <!-- Empty State -->
                 <div id="saved-empty" class="hidden flex-col items-center justify-center py-20 text-center">
@@ -947,6 +949,6 @@
         });
 
     </script>
-    <script type="module" src="./js/app.js?v=31"></script>
+    <script type="module" src="./js/app.js?v=32"></script>
 </body>
 </html>

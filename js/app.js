@@ -7,12 +7,13 @@ import { clearTickets, loadTickets, removeTicket, saveTicket } from './storage.j
 import { ball, formatDate, setVisible } from './ui.js';
 
 const $ = id => document.getElementById(id);
+const MAX_SAVED_TICKETS = 50;
 const state = { view: 'lottery', ticket: null, status: 'NEW_TICKET' };
 const dom = {
   views: Object.fromEntries(['lottery', 'saved', 'results', 'info'].map(name => [name, $(`view-${name}`)])),
   nav: document.querySelectorAll('.nav-btn'), main: document.querySelector('main'), header: $('header-desc'),
   ticket: $('ticket-container'), grid: $('numbers-grid'), save: $('btn-save'), saveIcon: $('save-icon'), saveText: $('save-text'),
-  actions: $('action-buttons'), revealMessage: $('reveal-message'), savedList: $('saved-list'), savedEmpty: $('saved-empty'), deleteAll: $('btn-delete-all'),
+  actions: $('action-buttons'), revealMessage: $('reveal-message'), savedList: $('saved-list'), savedEmpty: $('saved-empty'), savedLimitMessage: $('saved-limit-message'), deleteAll: $('btn-delete-all'),
   resultRound: $('result-round'), resultDate: $('result-date'), resultNumbers: $('result-numbers'), resultBonus: $('result-bonus'), resultSummary: $('result-summary'), resultList: $('result-list'),
   modal: $('confirm-modal'), modalContent: $('confirm-modal-content'), modalMessage: $('confirm-message'), toast: $('toast-message')
 };
@@ -87,10 +88,12 @@ function saveCurrentTicket() {
 
 function renderSavedTickets() {
   const tickets = loadTickets();
+  const visibleTickets = tickets.slice(0, MAX_SAVED_TICKETS);
   dom.savedList.replaceChildren();
   setVisible(dom.savedEmpty, tickets.length === 0);
+  setVisible(dom.savedLimitMessage, tickets.length > MAX_SAVED_TICKETS, 'block');
   dom.deleteAll.classList.toggle('hidden', tickets.length === 0);
-  tickets.forEach(ticket => {
+  visibleTickets.forEach(ticket => {
     const round = ticket.drawRound ?? drawRoundForDate(new Date(ticket.createdAt || ticket.savedAt));
     const item = document.createElement('article');
     item.className = 'bg-white p-2 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 scratch-bg-pattern';
@@ -123,8 +126,9 @@ function renderResults() {
   dom.resultNumbers.replaceChildren(...latestDraw.numbers.map(number => ball(number, 'w-10 h-10 text-sm')));
   dom.resultBonus.replaceChildren(ball(latestDraw.bonus, 'w-10 h-10 text-sm'));
   const tickets = loadTickets();
-  dom.resultSummary.textContent = tickets.length ? `저장한 ${tickets.length}개 번호를 이번 회차와 비교했어요.` : '저장한 번호가 없어요.';
-  dom.resultList.replaceChildren(...tickets.map(ticket => {
+  const visibleTickets = tickets.slice(0, MAX_SAVED_TICKETS);
+  dom.resultSummary.textContent = tickets.length ? `저장한 ${tickets.length}개 번호를 이번 회차와 비교했어요.${tickets.length > MAX_SAVED_TICKETS ? ' 최근 50개만 표시합니다.' : ''}` : '저장한 번호가 없어요.';
+  dom.resultList.replaceChildren(...visibleTickets.map(ticket => {
     const round = ticket.drawRound ?? drawRoundForDate(new Date(ticket.createdAt || ticket.savedAt));
     const compared = round === latestDraw.round ? compareNumbers(ticket.numbers) : null;
     const item = document.createElement('article');
