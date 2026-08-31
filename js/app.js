@@ -1,5 +1,5 @@
-import { createTicket } from './lotto.js';
-import { createScratchCard } from './scratch.js?v=2';
+import { createTicket, drawRoundForDate } from './lotto.js';
+import { createScratchCard } from './scratch.js?v=6';
 import { createSoundEffects } from './sound.js?v=2';
 import { celebrate } from './celebration.js';
 import { compareNumbers, latestDraw } from './results.js';
@@ -29,8 +29,8 @@ function issueTicket() {
   state.ticket = { ...createTicket(), revealed: false };
   dom.grid.replaceChildren(...state.ticket.numbers.map(number => ball(number, 'lotto-ball')));
   setSaveButton(false);
-  dom.actions.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
-  dom.actions.classList.remove('opacity-100', 'translate-y-0');
+  dom.actions.classList.add('mt-0', 'max-h-0', 'overflow-hidden', 'opacity-0', 'pointer-events-none', 'translate-y-4');
+  dom.actions.classList.remove('mt-4', 'max-h-96', 'opacity-100', 'translate-y-0');
   dom.revealMessage.classList.add('hidden');
   dom.ticket.classList.remove('pop-in');
   void dom.ticket.offsetWidth;
@@ -57,8 +57,8 @@ function revealTicket() {
   navigator.vibrate?.(20);
   logEvent('scratch_completed', { ticket_id: state.ticket.id });
   setTimeout(() => {
-    dom.actions.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-    dom.actions.classList.add('opacity-100', 'translate-y-0');
+    dom.actions.classList.remove('mt-0', 'max-h-0', 'overflow-hidden', 'opacity-0', 'pointer-events-none', 'translate-y-4');
+    dom.actions.classList.add('mt-4', 'max-h-96', 'opacity-100', 'translate-y-0');
     dom.revealMessage.classList.remove('hidden');
   }, 500);
 }
@@ -91,14 +91,15 @@ function renderSavedTickets() {
   setVisible(dom.savedEmpty, tickets.length === 0);
   dom.deleteAll.classList.toggle('hidden', tickets.length === 0);
   tickets.forEach(ticket => {
+    const round = ticket.drawRound ?? drawRoundForDate(new Date(ticket.createdAt || ticket.savedAt));
     const item = document.createElement('article');
-    item.className = 'bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3 scratch-bg-pattern';
+    item.className = 'bg-white p-2 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-1 scratch-bg-pattern';
     const top = document.createElement('div');
-    top.className = 'flex justify-between items-center text-xs text-gray-400 bg-white/80 px-2 py-1 rounded';
+    top.className = 'flex justify-between items-center text-xs font-bold text-gray-600 bg-white/80 px-1 rounded';
     const date = document.createElement('span');
-    date.textContent = `저장일시: ${formatDate(ticket.savedAt)}`;
+    date.textContent = `저장일시: ${formatDate(ticket.savedAt)} · 제${round}회`;
     const remove = document.createElement('button');
-    remove.className = 'text-gray-300 hover:text-red-500 transition-colors p-1';
+    remove.className = 'text-red-500 hover:text-red-600 transition-colors p-2 -mr-1';
     remove.setAttribute('aria-label', '저장 번호 삭제');
     remove.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
     remove.onclick = () => {
@@ -124,23 +125,38 @@ function renderResults() {
   const tickets = loadTickets();
   dom.resultSummary.textContent = tickets.length ? `저장한 ${tickets.length}개 번호를 이번 회차와 비교했어요.` : '저장한 번호가 없어요.';
   dom.resultList.replaceChildren(...tickets.map(ticket => {
-    const compared = compareNumbers(ticket.numbers);
+    const round = ticket.drawRound ?? drawRoundForDate(new Date(ticket.createdAt || ticket.savedAt));
+    const compared = round === latestDraw.round ? compareNumbers(ticket.numbers) : null;
     const item = document.createElement('article');
-    item.className = 'bg-white rounded-xl border border-gray-100 p-4 shadow-sm';
+    item.className = 'bg-white rounded-xl border border-gray-100 p-2 shadow-sm';
     const title = document.createElement('p');
     title.className = 'text-sm font-bold text-gray-700';
-    title.textContent = compared.count ? `번호 ${compared.count}개 일치${compared.bonus ? ' · 보너스 일치' : ''}` : '일치 번호 없음';
+    title.textContent = compared ? `번호 ${compared.count}개 일치${compared.bonus ? ' · 보너스 일치' : ''}` : `제${round}회 추첨 전`;
     const numbers = document.createElement('div');
-    numbers.className = 'flex flex-wrap gap-2 mt-3';
+    numbers.className = 'flex items-center justify-between gap-2 mt-1';
     numbers.append(...ticket.numbers.map(number => {
       const element = ball(number, 'w-8 h-8 text-xs');
-      if (compared.matches.includes(number)) element.classList.add('ring-2', 'ring-orange-400', 'ring-offset-2');
-      if (number === latestDraw.bonus) element.classList.add('ring-2', 'ring-blue-400', 'ring-offset-2');
+      if (compared?.matches.includes(number)) element.classList.add('ring-2', 'ring-orange-400', 'ring-offset-2');
+      if (compared && number === latestDraw.bonus) element.classList.add('ring-2', 'ring-blue-400', 'ring-offset-2');
       return element;
     }));
+    const outcome = document.createElement('span');
+    const result = compared ? drawResultLabel(compared) : '추첨 전';
+    outcome.className = result === '낙첨' ? 'shrink-0 text-sm font-black text-red-500' : result === '추첨 전' ? 'shrink-0 text-sm font-black text-gray-700' : 'shrink-0 text-sm font-black text-green-700';
+    outcome.textContent = result;
+    numbers.append(outcome);
     item.append(title, numbers);
     return item;
   }));
+}
+
+function drawResultLabel({ count, bonus }) {
+  if (count === 6) return '1등 당첨';
+  if (count === 5 && bonus) return '2등 당첨';
+  if (count === 5) return '3등 당첨';
+  if (count === 4) return '4등 당첨';
+  if (count === 3) return '5등 당첨';
+  return '낙첨';
 }
 
 function switchTab(view) {

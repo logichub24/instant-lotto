@@ -16,6 +16,7 @@
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
+        .text-gray-300, .text-gray-400, .text-gray-500, .text-gray-600 { color: #172554 !important; }
 
         /* App Container constrained for mobile feel on desktop */
         .app-container {
@@ -34,13 +35,16 @@
             position: relative;
             width: 100%;
             /* 160px 높이는 그대로 두고 너비를 부모 컨테이너 전체로 확실하게 차지하도록 수정 */
-            min-height: 160px; 
+            min-height: 184px;
             border-radius: 0.75rem;
             overflow: hidden;
-            background-color: #ffffff;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+            background: linear-gradient(145deg, #fff, #f8fafc);
+            border: 1px solid #e2e8f0;
+            box-shadow: inset 0 2px 12px rgba(15,23,42,.08), 0 3px 10px rgba(15,23,42,.04);
             /* flex 제거: 내부 요소 위치는 absolute로 제어 */
         }
+        #scratch-zone.is-shining::after { content: ''; position: absolute; inset: 0; z-index: 15; pointer-events: none; background: linear-gradient(112deg, transparent 30%, rgba(255,255,255,.04) 40%, rgba(255,255,255,.72) 50%, rgba(255,255,255,.05) 60%, transparent 70%); mix-blend-mode: screen; animation: mirrorSweep 2.8s ease-in-out infinite; }
+        @keyframes mirrorSweep { from { transform: translateX(-115%); } to { transform: translateX(115%); } }
 
         /* Scratch Canvas */
         #scratch-canvas {
@@ -60,10 +64,10 @@
         /* Revealed Numbers Layer */
         #numbers-grid {
             /* flex 레이아웃으로 변경하여 번호 중앙 정렬 최적화 */
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-content: center;
+            display: grid;
+            grid-template-columns: repeat(3, 48px);
+            grid-template-rows: repeat(2, 48px);
+            place-content: center;
             gap: 1rem 1.5rem;
             width: 100%;
             height: 100%;
@@ -107,7 +111,7 @@
         .ball-4 { background: radial-gradient(circle at 34% 25%, #e6ebf1, #8d98a7 50%, #5b6572 100%); } /* 31~40 Gray */
         .ball-5 { background: radial-gradient(circle at 34% 25%, #a7f2be, #24a761 50%, #117a42 100%); } /* 41~45 Green */
 
-        #ticket-container { background: linear-gradient(145deg, #ffffff, #fffaf2); border-color: #fed7aa; box-shadow: 0 16px 36px rgba(249,115,22,.15), 0 3px 8px rgba(15,23,42,.08); }
+        #ticket-container { background: linear-gradient(145deg, #ffffff, #fffaf2); border-color: #fdba74; box-shadow: 0 18px 40px rgba(249,115,22,.18), 0 4px 10px rgba(15,23,42,.1); }
         #ticket-container.celebrating::after { content: ''; position: absolute; inset: -20%; pointer-events: none; z-index: 25; background: radial-gradient(circle, rgba(255,255,255,.96) 0%, rgba(255,220,115,.7) 16%, rgba(255,119,38,.24) 38%, transparent 66%); animation: celebrationFlash .85s ease-out both; }
         #ticket-container > div:first-child { position: relative; overflow: hidden; background: linear-gradient(105deg, #fff7ed, #fffbeb 48%, #eff6ff); }
         #ticket-container > div:first-child::after { content: '✦  ✦  ✦'; position: absolute; right: 14px; top: 7px; color: rgba(251,146,60,.22); letter-spacing: 8px; font-size: .8rem; }
@@ -155,8 +159,8 @@
 
     <div class="app-container">
         
-        <header class="pt-8 bg-white sticky top-0 z-20 shadow-sm flex flex-col">
-            <div class="px-6 pb-4">
+        <header class="pt-5 bg-white sticky top-0 z-20 shadow-sm flex flex-col">
+            <div class="px-6 pb-2">
                 <h1 class="text-xl font-black text-center text-gray-800 tracking-tight">즉석로또복권</h1>
                 <p id="header-desc" class="text-center text-sm text-gray-500 mt-1">긁어서 오늘의 번호를 확인하세요</p>
             </div>
@@ -185,19 +189,19 @@
         <main class="flex-1 relative overflow-y-auto pb-8">
             
             <!-- View: Lottery (Home) -->
-            <section id="view-lottery" class="px-6 py-6 flex flex-col items-center justify-center min-h-[60vh]">
+            <section id="view-lottery" class="px-6 py-4 flex flex-col items-center">
                 
                 <!-- Ticket Container -->
                 <div id="ticket-container" class="relative w-full max-w-[340px] bg-white rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] border border-gray-200 flex flex-col overflow-hidden select-none transition-transform duration-300">
                     
                     <!-- Ticket Header -->
-                    <div class="px-4 py-4 text-center bg-gradient-to-b from-orange-50 to-white border-b border-orange-100">
+                    <div class="px-4 py-3 text-center bg-gradient-to-b from-orange-50 to-white border-b border-orange-100">
                         <h3 class="text-orange-500 font-black tracking-widest text-lg mb-1">✦ 오늘의 행운복권 ✦</h3>
                     </div>
                     
                     <!-- Ticket Body (Scratch Zone Only) -->
                     <!-- w-full을 추가하여 부모 컨테이너 너비 전체 사용 -->
-                    <div class="p-6 flex flex-col items-center justify-center bg-gray-50 border-y border-gray-100 relative w-full">
+                    <div class="p-4 flex flex-col items-center justify-center bg-gray-50 border-y border-gray-100 relative w-full">
                         <!-- The actual area user scratches -->
                         <!-- w-full을 추가하여 패딩 안쪽 공간 전체 사용 -->
                         <div id="scratch-zone" class="w-full">
@@ -211,13 +215,18 @@
                     </div>
 
                     <!-- Ticket Footer -->
-                    <div class="p-3 text-center bg-gray-100 border-t border-gray-200">
-                        <p class="text-gray-400 text-xs font-bold tracking-[0.2em]">6/45 RANDOM NUMBER</p>
+                    <div class="p-2 text-center bg-gray-100 border-t border-gray-200">
+                        <p class="text-gray-500 text-xs font-black tracking-[0.12em]">6/45 행운 번호</p>
                     </div>
                 </div>
 
+                <aside class="w-full max-w-[340px] mt-4 rounded-lg border border-amber-100 bg-amber-50/60 px-3 py-2 text-left text-[11px] leading-relaxed text-amber-800">
+                    <p class="font-bold"><i class="fa-solid fa-circle-info mr-1"></i> 안내</p>
+                    <p>실제 복권 당첨이나 당첨 확률을 보장하지 않습니다.</p>
+                </aside>
+
                 <!-- Action Buttons -->
-                <div id="action-buttons" class="mt-8 flex flex-col gap-3 w-full max-w-[340px] opacity-0 pointer-events-none transition-all duration-500 translate-y-4">
+                <div id="action-buttons" class="mt-0 max-h-0 overflow-hidden flex flex-col gap-3 w-full max-w-[340px] opacity-0 pointer-events-none transition-all duration-500 translate-y-4">
                     <p id="reveal-message" class="text-center text-orange-500 font-bold mb-2 hidden">오늘의 번호가 완성됐어요</p>
                     
                     <button id="btn-save" class="w-full py-4 rounded-xl font-bold text-lg border-2 border-orange-400 text-orange-500 bg-white hover:bg-orange-50 transition-colors flex items-center justify-center gap-2">
@@ -234,13 +243,13 @@
             </section>
 
             <!-- View: Saved Numbers -->
-            <section id="view-saved" class="hidden px-6 py-6">
-                <div class="flex justify-between items-center mb-6">
+            <section id="view-saved" class="hidden px-6 py-4">
+                <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold text-gray-800">저장된 번호</h2>
                     <button id="btn-delete-all" class="text-sm text-red-400 border border-red-200 px-3 py-1 rounded-full hover:bg-red-50 hidden transition-colors">전체 삭제</button>
                 </div>
                 
-                <div id="saved-list" class="flex flex-col gap-4">
+                <div id="saved-list" class="flex flex-col gap-2">
                     <!-- Saved items injected here -->
                 </div>
 
@@ -257,33 +266,37 @@
                 </div>
             </section>
 
-            <section id="view-results" class="hidden px-6 py-6">
-                <div class="flex items-center justify-between mb-6">
+            <section id="view-results" class="hidden px-6 py-4">
+                <div class="flex items-center justify-between mb-4">
                     <div>
                         <p id="result-round" class="text-orange-500 font-black text-sm"></p>
                         <h2 class="text-2xl font-black text-gray-800 mt-1">이번 주 추첨결과</h2>
                     </div>
                     <i class="fa-solid fa-trophy text-3xl text-amber-400"></i>
                 </div>
-                <div class="bg-gradient-to-br from-orange-50 via-amber-50 to-white rounded-2xl p-5 border border-orange-100 shadow-sm">
-                    <p id="result-date" class="text-sm text-gray-500 mb-4"></p>
-                    <p class="text-xs font-bold text-gray-500 mb-3">당첨번호</p>
-                    <div id="result-numbers" class="flex flex-wrap gap-2 mb-5"></div>
-                    <div class="flex items-center gap-3 border-t border-orange-100 pt-4">
-                        <span class="text-xs font-bold text-gray-500">보너스</span>
-                        <div id="result-bonus"></div>
+                <div class="bg-gradient-to-br from-orange-50 via-amber-50 to-white rounded-2xl p-3 border border-orange-100 shadow-sm">
+                    <p id="result-date" class="text-sm text-gray-500 mb-2"></p>
+                    <div class="grid grid-cols-[1fr_auto] items-end gap-x-4 border-t border-orange-100 pt-2">
+                        <div>
+                            <p class="text-xs font-bold text-gray-500 mb-2">당첨번호</p>
+                            <div id="result-numbers" class="flex gap-1.5"></div>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-xs font-bold text-gray-500 mb-2">보너스</p>
+                            <div id="result-bonus"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="mt-8">
+                <div class="mt-4">
                     <h3 class="font-black text-gray-800">내 저장번호 결과</h3>
-                    <p id="result-summary" class="text-sm text-gray-500 mt-1 mb-4"></p>
-                    <div id="result-list" class="flex flex-col gap-3"></div>
+                    <p id="result-summary" class="text-sm text-gray-500 mt-1 mb-2"></p>
+                    <div id="result-list" class="flex flex-col gap-2"></div>
                 </div>
             </section>
 
             <!-- View: Info -->
-            <section id="view-info" class="hidden px-6 py-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">이용안내</h2>
+            <section id="view-info" class="hidden px-6 py-4">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">이용안내</h2>
                 
                 <div class="bg-blue-50 rounded-2xl p-5 mb-5 border border-blue-100">
                     <h3 class="font-bold text-blue-800 mb-2 flex items-center gap-2">
@@ -291,6 +304,9 @@
                     </h3>
                     <p class="text-sm text-blue-700 leading-relaxed">
                         즉석로또복권은 로또 6/45 번호를 무작위로 조합해주는 엔터테인먼트형 번호 생성 서비스입니다.
+                    </p>
+                    <p class="text-sm text-blue-700 leading-relaxed mt-2">
+                        추첨번호는 매주 일요일 오전 3시에 1차 갱신되며, 오전 10시에 최종 반영됩니다.
                     </p>
                 </div>
 
@@ -931,6 +947,6 @@
         });
 
     </script>
-    <script type="module" src="./js/app.js?v=9"></script>
+    <script type="module" src="./js/app.js?v=31"></script>
 </body>
 </html>

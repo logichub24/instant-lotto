@@ -2,4 +2,4 @@
 
 번호를 긁어 공개하고 저장번호를 공식 추첨 결과와 비교하는 웹 앱입니다.
 
-매주 토요일 21:00(KST) GitHub Actions가 동행복권 공개 결과를 갱신합니다. `data/draw-history.json`과 Git 커밋 이력이 결과 백업으로 남습니다.
+매주 일요일 오전 3시와 오전 10시(KST) GitHub Actions가 동행복권 공개 결과를 갱신합니다. `data/draw-history.json`과 Git 커밋 이력이 결과 백업으로 남습니다.
