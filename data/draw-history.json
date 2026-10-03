@@ -68,5 +68,19 @@
     ],
     "bonus": 35,
     "source": "https://www.dhlottery.co.kr/lt645/result?ltEpsd=1243"
+  },
+  {
+    "round": 1244,
+    "date": "2026.10.03",
+    "numbers": [
+      1,
+      13,
+      18,
+      26,
+      34,
+      38
+    ],
+    "bonus": 25,
+    "source": "https://www.dhlottery.co.kr/lt645/result?ltEpsd=1244"
   }
 ]
