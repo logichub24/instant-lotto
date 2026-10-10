@@ -1,16 +1,16 @@
 export const latestDraw = {
-  "round": 1244,
-  "date": "2026.10.03",
+  "round": 1245,
+  "date": "2026.10.10",
   "numbers": [
-    1,
-    13,
-    18,
-    26,
-    34,
-    38
+    4,
+    5,
+    25,
+    28,
+    32,
+    42
   ],
-  "bonus": 25,
-  "source": "https://www.dhlottery.co.kr/lt645/result?ltEpsd=1244"
+  "bonus": 12,
+  "source": "https://www.dhlottery.co.kr/lt645/result?ltEpsd=1245"
 };
 
 export function compareNumbers(numbers, draw = latestDraw) {
